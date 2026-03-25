@@ -10,12 +10,15 @@ import {
   Typography,
   AppBar,
   CssBaseline,
-  IconButton
+  IconButton,
+  Button
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PeopleIcon from "@mui/icons-material/People";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -60,8 +63,15 @@ function Performance({ data }) {
 
 export default function Dashboard() {
   const [active, setActive] = useState("Students");
+  const navigate = useNavigate();
 
+  const handleLogout = () => {
+    // clear auth (if any)
+    localStorage.clear();
+    navigate("/"); // redirect to login page
+  };
 
+  // ✅ Data
   const studentsData = [
   ];
 
@@ -116,15 +126,35 @@ export default function Dashboard() {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
 
+      {/* AppBar */}
       <AppBar position="fixed" sx={{ zIndex: 1201 }}>
-        <Toolbar>
-          <IconButton color="inherit">
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6">Admin Panel</Typography>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton color="inherit">
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6">Admin Panel</Typography>
+          </Box>
+
+          {/* ✅ Logout Button */}
+          <Button
+            variant="contained"
+            startIcon={<LogoutIcon />}
+            onClick={handleLogout}
+            sx={{
+              background: "#ff4d4f",
+              "&:hover": { background: "#d9363e" },
+              borderRadius: "20px",
+              textTransform: "none",
+              fontWeight: "bold"
+            }}
+          >
+            Logout
+          </Button>
         </Toolbar>
       </AppBar>
 
+      {/* Drawer */}
       <Drawer
         variant="permanent"
         sx={{
@@ -135,7 +165,7 @@ export default function Dashboard() {
         {drawerContent}
       </Drawer>
 
-     
+      {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
         {active === "Students" && <Students data={studentsData} />}
         {active === "Course Performance" && (
