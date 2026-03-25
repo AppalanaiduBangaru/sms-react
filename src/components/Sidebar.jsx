@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Drawer,
   List,
@@ -6,44 +7,80 @@ import {
   ListItemText,
   Toolbar,
   Box,
-  Typography
+  Typography,
+  AppBar,
+  CssBaseline,
+  IconButton
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import PeopleIcon from "@mui/icons-material/People";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import { useState } from "react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const drawerWidth = 240;
 
-export default function Sidebar({ mobileOpen, handleDrawerToggle }) {
+// ✅ Students Component
+function Students({ data }) {
+  return (
+    <Box p={3}>
+      <Typography variant="h5" fontWeight="bold">
+        Students Marks
+      </Typography>
+
+      {data.map((s, i) => (
+        <Typography key={i} sx={{ mt: 1 }}>
+          {s.name}: {s.marks}
+        </Typography>
+      ))}
+    </Box>
+  );
+}
+
+// ✅ Performance Component
+function Performance({ data }) {
+  return (
+    <Box p={3}>
+      <Typography variant="h5" fontWeight="bold">
+        Course Performance
+      </Typography>
+
+      <Box height={300} mt={2}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="marks" />
+          </BarChart>
+        </ResponsiveContainer>
+      </Box>
+    </Box>
+  );
+}
+
+export default function Dashboard() {
   const [active, setActive] = useState("Students");
+
+
+  const studentsData = [
+  ];
 
   const menuItems = [
     { text: "Students", icon: <PeopleIcon /> },
-    { text: "Performance", icon: <BarChartIcon /> }
+    { text: "Course Performance", icon: <BarChartIcon /> }
   ];
 
   const drawerContent = (
     <Box
       sx={{
         height: "100%",
-        background: "linear-gradient(180deg, #1e3c72, #2a5298)",
+        background: "linear-gradient(180deg,#0f2027,#203a43,#2c5364)",
         color: "white"
       }}
     >
       <Toolbar />
-      
-      {/* Logo / Title */}
-      <Typography
-        variant="h6"
-        sx={{
-          textAlign: "center",
-          fontWeight: "bold",
-          mb: 2,
-          letterSpacing: 1,
-          animation: "fadeIn 1s ease"
-        }}
-      >
-        🎓 Admin Panel
+      <Typography variant="h6" textAlign="center" mb={2}>
+        🎓 Dashboard
       </Typography>
 
       <List>
@@ -52,89 +89,59 @@ export default function Sidebar({ mobileOpen, handleDrawerToggle }) {
             key={item.text}
             onClick={() => setActive(item.text)}
             sx={{
-              mx: 1.5,
+              mx: 2,
               my: 1,
               borderRadius: 2,
-              transition: "all 0.3s ease",
               background:
                 active === item.text
                   ? "rgba(255,255,255,0.2)"
                   : "transparent",
               "&:hover": {
                 background: "rgba(255,255,255,0.15)",
-                transform: "translateX(8px)"
+                transform: "translateX(6px)"
               }
             }}
           >
-            <ListItemIcon
-              sx={{
-                color: "white",
-                transition: "0.3s",
-                transform:
-                  active === item.text ? "scale(1.2)" : "scale(1)"
-              }}
-            >
+            <ListItemIcon sx={{ color: "white" }}>
               {item.icon}
             </ListItemIcon>
-
-            <ListItemText
-              primary={item.text}
-              primaryTypographyProps={{
-                fontWeight: active === item.text ? "bold" : "normal"
-              }}
-            />
+            <ListItemText primary={item.text} />
           </ListItemButton>
         ))}
       </List>
-
-      {/* Keyframes */}
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}
-      </style>
     </Box>
   );
 
   return (
-    <>
-      {/* Mobile Drawer */}
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+
+      <AppBar position="fixed" sx={{ zIndex: 1201 }}>
+        <Toolbar>
+          <IconButton color="inherit">
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6">Admin Panel</Typography>
+        </Toolbar>
+      </AppBar>
+
       <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
+        variant="permanent"
         sx={{
-          display: { xs: "block", md: "none" },
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            borderRadius: "0 16px 16px 0",
-            boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
-            transition: "all 0.4s ease"
-          }
+          width: drawerWidth,
+          "& .MuiDrawer-paper": { width: drawerWidth }
         }}
       >
         {drawerContent}
       </Drawer>
 
-      {/* Desktop Drawer */}
-      <Drawer
-        variant="permanent"
-        open
-        sx={{
-          display: { xs: "none", md: "block" },
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            borderRadius: "0 20px 20px 0",
-            boxShadow: "0 8px 30px rgba(0,0,0,0.25)",
-            transition: "all 0.4s ease"
-          }
-        }}
-      >
-        {drawerContent}
-      </Drawer>
-    </>
+     
+      <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
+        {active === "Students" && <Students data={studentsData} />}
+        {active === "Course Performance" && (
+          <Performance data={studentsData} />
+        )}
+      </Box>
+    </Box>
   );
 }
